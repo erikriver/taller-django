@@ -107,6 +107,23 @@ Modelo
 ========
 imagen de una modelo
 
+Definamos la base de datos
+===========================
+settings.py
+--------------
+.. code-block:: python
+DATABASES = { 
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'plus.db',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    }   
+}
+.. note:: 
+    Diccionarion es Python
 
 Modelo
 ========
@@ -117,8 +134,13 @@ Modelo
 
 Definamos un Modelo
 ===================
-class Status
+.. code-block:: python
+from django.db import models
 
+class Status(models.Model):
+    text    = models.TextField()
+    author  = models.ForeignKey("auth.User")
+    created = models.DateTimeField(auto_now_add=True)
 
 Modelos contienen relaciones
 =============================
@@ -126,10 +148,22 @@ imagen de una tabla
 
 SQL de una tabla
 =================
+.. code-block:: bash
+$ python manage.py sql polls
+
+.. code-block:: sql
+BEGIN;
+CREATE TABLE "plus_status" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "text" text NOT NULL,
+    "author_id" integer NOT NULL REFERENCES "auth_user" ("id"),
+    "created" datetime NOT NULL
+);
+COMMIT;
 
 Sincronizando la BD
 ====================
-
+.. code-block:: bash
 $ ./manage.py syncdb
 
 API de Base de Datos
@@ -137,37 +171,92 @@ API de Base de Datos
     * Django provee de una API de alto nivel para trabajar con objetos
     * Provee funciones para crear, obtener, actualizar, eliminar datos 
 
+Jugando con la API de la BD
+============================
+.. code-block:: bash
+$ python manage.py shell
+
 Creando Objetos
 ================
+Creando un usario
+------------------
+.. code-block:: python
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.create_user('erik','erik@rivera.pro', 'erik')
+>>> user.save()
+>>> user
+<User: erik>
 
-* crear un usuario
-* crear un status
+Creando Objetos
+================
+Creando un status
+------------------
+.. code-block:: python
+>>> from plus.models import Status
+>>> Status
+<class 'plus.models.Status'>
+>>> status = Status(text="Primer estado del taller", author=user)
+>>> status.save()
+>>> status
+>>> status.text
+'Primer estado del taller'
+>>> status.author
+<User: erik>
+>>>
 
 Obteniendo objetos
 ===================
+.. code-block:: python
 los modelos tienen un miembro llamado 'objects', usado para recuperar datos
-
-Users.objects.all()
-Users.objects.get(id=10)
+>>> from django.contrib.auth.models import User 
+>>> User.objects.all()
+[<User: admin>, <User: juan>]
+>>> user = User.objects.get(id=2)
+>>> user
+<User: erik>
+>>> user.email
+u'erik@rivera.pro'
 
 
 Django Admin
 =====================================
 
  * Panel de control para los modelos
- * Opcional
- * agregar django.contrib.admin a INSTALLED_APPS
+ * El panel de control es opcional
 
-.. code-block:: bash
-    $./manage.py syncdb
+Instalando el panel
+====================
 
- * editar djplus/urls.py
+    * agregar django.contrib.admin a INSTALLED_APPS
+    * editar djplus/urls.py 
+    * .. code-block:: bash
+        $./manage.py syncdb
 
-Extendiendo el Panel
+
+
+Agrgando modelos al panel
+=========================
+ * crear el archivo admin.py
+.. code-block:: python
+from plus.models import Status
+from django.contrib import admin
+
+admin.site.register(Status)
+
+Extendiendo 'Metadata' del modelo
 ========================= 
+.. code-block:: python
+class Status(models.Model):
+    text    = models.TextField()
+    author  = models.ForeignKey("auth.User")
+    created = models.DateTimeField(auto_now_add=True)
 
-    * __unicode__
-    * class Meta
+    def __unicode__(self):
+        return self.text
+
+    class Meta:
+        verbose_name_plural = 'Statuses'
+        ordering = ['created',]
 
 Vistas
 =======
@@ -190,27 +279,75 @@ Ejemplo de Vista
 =================
 
 .. code-block:: python
-
-
-Generic Views
-=============
+from django.http import HttpResponse
+ 
+def my_status(request):
+    return HttpResponse("Hello World!")
 
 URLConf
 ========
-    * Mapear vistas
+    * Sistema de ruteo de django
+    * Mapea las vistas o plantillas a una URL
+    * Usa expresiones regulares
+    * Evita url sucias
 
+Ejemplo de URLConf
+===================
+.. code-block:: python
+from django.conf.urls.defaults import *
+ 
+urlpatterns = patterns('',
+    (r'^hello/', "plus.views.my_status"),
+)
+
+Practiquemos!
+===============
+
+from django.http import HttpResponse
+from plus.models import Status
+
+def my_status(request):
+    status = Status.objects.all()
+    count = len(status)
+    text = "There are %s statuses" %(count)
+    return HttpResponse(text)
+
+
+Vistas Genéricas
+=============
+    * Conjunto de vistas que integran funcionalidades genéricas y reutilizables
+    * Apoyan en el ahorro de tiempo no reescribiendo funciones comúnes
+
+.. note:: Django 1.3 ahora implementa las vistas como Clases, a diferencia pasada que eran funciones las cuales quedarán obsoletas.
 
 Plantillas
 ===========
     * Define el tipo de dato de una pagina
     * Comunmente usado para generar xHTML
-    * Pero se usado para cualquier archivo basado en texto (e-mail, RSS, CSV, XML, etc.)
+    * Pero se usa para cualquier formato de texto (e-mail, RSS, CSV, XML, etc.)
     * Fueron diseñados pensando en diseñadores gráficos.
 
 Ejemplo de Plantilla
 ====================
 .. code-block:: html
-
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>My Status</title>
+    </head>
+    <body>
+        <h1>Total: {{ statuses|length }}</h1>
+        <ul>
+        {% for status in stuses %}
+            <li>
+                <img src="http://rivera.pro/default.gif" width="32px" height="32px">
+                <b>{{ status.author.username }} </b>: {{ status.text }}
+            </li>
+        {% endfor %}
+        </ul>
+    </body>
+</html>
 
 Componentes de Plantillas
 =========================
@@ -228,6 +365,8 @@ Filters
 
 Tags
 ======
+.. code-block:: html
+
 
 Herencia de Plantillas
 ======================

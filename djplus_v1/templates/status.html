@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>My Status</title>
+    </head>
+    <body>
+        <h1>Total: {{ statuses|length }}</h1>
+        <ul>
+            {% for status in stuses %}
+            <li>
+            <img src="http://rivera.pro/default.gif" width="32px" height="32px">
+            <b>{{ status.author.username }} </b>: {{ status.text }}
+            </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
+
+

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Total: {{ statuses|length }}</h1>
+<ul>
+    {% for status in stuses %}
+    <li>
+        <img src="http://rivera.pro/default.gif" width="32px" height="32px">
+        <b>{{ status.author.username }} </b>: {{ status.text }}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
