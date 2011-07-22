@@ -1,0 +1,57 @@
+* { margin: 0; padding: 0; }
+details {display: none;}
+body {
+  width: 800px; height: 600px;
+  margin-left: -400px; margin-top: -300px;
+  position: absolute; top: 50%; left: 50%;
+  overflow: hidden;
+}
+section {
+  position: absolute;
+  pointer-events: none;
+  width: 100%; height: 100%;
+}
+section[aria-selected] { pointer-events: auto;}
+body {display: none}
+body.loaded {display: block}
+
+html { background-color: black; }
+body {background-color: white;}
+/* A section is a slide. It's size is 800x600, and this will never change */
+section {
+    /* The font from Google */
+    font-family: 'Oswald', arial, serif;
+    font-size: 2em;
+}
+h1, h2, h3 {
+    margin-top: 50px;
+    text-align: center;
+}
+ul {
+    margin-left: 200px;
+}
+a { color: #FF0066; } a:hover {text-decoration: underline;}
+footer { position: absolute; bottom: 50px; right: 50px; }
+
+/* Transition effect */
+/* Feel free to change the transition effect for original
+   animations. See here:
+   https://developer.mozilla.org/en/CSS/CSS_transitions
+   How to use CSS3 Transitions: */
+section {
+    -moz-transition: left 400ms linear 0s;
+    -webkit-transition: left 400ms linear 0s;
+    -o-transition: left 400ms linear 0s;
+    -ms-transition: left 400ms linear 0s;
+    transition: left 400ms linear 0s;
+}
+
+/* Before */
+section { left: -150%; }
+/* Now */
+section[aria-selected] { left: 0; }
+/* After */
+section[aria-selected] ~ section { left: +150% }
+
+
+
