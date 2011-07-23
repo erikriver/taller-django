@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+    <form class="uniForm" id="generic_form" method="POST" action="{{ url_form_post }}">
+    {% csrf_token %}
+        {{ form.as_p }}
+        <div class="form_block">
+            <input type="submit" value="{% trans "Save" %}"/>
+        </div>
+    </form>
+
+<h1>Total: {{ statuses|length }}</h1>
+<ul class="statuses">
+    {% for status in statuses %}
+    <li id="status-{{status.id}}">
+        <img src="http://rivera.pro/default.gif" width="32px" height="32px">
+        <b>{{ status.author.username }} </b>: {{ status.text }}
+        <div class="plus">
+            <a class="vote" href="/vote?vote={{ status.id }}">+1 ({{ status.plus }})</a>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

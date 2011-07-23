@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="http://demo.blufrog.info/static/css/form.css"/>
+        <style>
+            .uniForm {
+                width: 500px;
+            }
+            .uniForm textarea {
+                width: 500px;
+            }
+
+            .statuses {
+                width: 500px;
+            }
+
+            .statuses li {
+                margin-bottom: 1px solid #F0F;
+            }
+
+            .statuses .plus {
+                margin-left: 200px;
+            }
+
+        </style>
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+        <title>{% block title %} Title {% endblock %}</title>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('.vote').click(function() {
+                    var url = $(this).attr('href');
+                    $.getJSON(url, function(data) {
+                        $('#status-'+data.id+' .vote').html('+1 ('+data.count+')');
+                    });
+                    return false;
+                });
+            });
+        </script>
+    </head>
+    <body>
+        {% block content %}
+
+        {% endblock %}
+    </body>
+</html>
+
+
