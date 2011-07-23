@@ -21,3 +21,6 @@ class Plus(models.Model):
     content_type = models.ForeignKey(ContentType, verbose_name='content type', blank=True, null=True)
     content_id = models.PositiveIntegerField(blank=True, null=True)
     content = generic.GenericForeignKey('content_type', 'content_id')
+
+    class Meta:
+        unique_together = ('user', 'content_type', 'content_id')
